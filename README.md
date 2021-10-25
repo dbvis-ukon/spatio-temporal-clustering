@@ -1,9 +1,9 @@
 # spatio-temporal-clustering
 
-**st_clustering** is an open-source software package for the spatial-temporal clustering:
+**st_clustering** is an open-source software package for spatial-temporal clustering:
 
 - Built on top of `sklearn`'s clustering algorithms
-- Scales to memory - using chuncking see the `st_fit_frame_split` method
+- Scales to memory using chuncking. See the `st_fit_frame_split` method
 
 ## Installation
 The easiest way to install *st_clustering* is by using `pip` :
