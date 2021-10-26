@@ -1,0 +1,4 @@
+include VERSION
+recursive-include src *
+global-exclude __pycache__/*
+global-exclude .ipynb_checkpoints/*
