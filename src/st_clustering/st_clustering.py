@@ -7,7 +7,6 @@ from joblib import Memory
 
 
 def st_decorator(target):
-
     def st_fit(self, X):
         """
         Apply the ST clustering algorithm 
@@ -70,7 +69,7 @@ def st_decorator(target):
 
         # default values for overlap
         if frame_overlap == None:
-            frame_overlap = self.eps2 # in the paper they use 2*self.eps2
+            frame_overlap = self.eps2  # in the paper they use 2*self.eps2
 
         if not self.eps1 > 0.0 or not self.eps2 > 0.0:
             raise ValueError('eps1, eps2 must be positive')
@@ -90,30 +89,40 @@ def st_decorator(target):
         for i in range(0, len(time), (frame_size - frame_overlap + 1)):
             for period in [time[i:i + frame_size]]:
                 frame = X[np.isin(X[:, 0], period)]
-                
+
                 self.st_fit(frame)
-                
+
                 # match the labels in the overlaped zone
                 # objects in the second frame are relabeled to match the cluster id from the first frame
                 if not type(labels) is np.ndarray:
                     labels = self.labels
                 else:
-                    frame_one_overlap_labels = labels[len(labels)-right_overlap:]
+                    frame_one_overlap_labels = labels[len(labels) -
+                                                      right_overlap:]
                     frame_two_overlap_labels = self.labels[0:right_overlap]
-                    
+
                     mapper = {}
-                    for j in list(zip(frame_one_overlap_labels,frame_two_overlap_labels)):
+                    for j in list(
+                            zip(frame_one_overlap_labels,
+                                frame_two_overlap_labels)):
                         mapper[j[1]] = j[0]
-                                      
+
                     # clusters without points in the overlapping area are ignored
                     # otherwise, there will be a key error
-                    ignore_clusters = set(self.labels) - set(frame_two_overlap_labels) # set difference
+                    ignore_clusters = set(self.labels) - set(
+                        frame_two_overlap_labels)  # set difference
                     # recode them to the value -99
-                    new_labels_unmatched = [j if j not in ignore_clusters else -99 for j in self.labels]
-                    
+                    new_labels_unmatched = [
+                        j if j not in ignore_clusters else -99
+                        for j in self.labels
+                    ]
+
                     # objects in the second frame are relabeled to match the cluster id from the first frame
-                    new_labels = np.array([mapper[j] if j!=-99 else j for j in new_labels_unmatched])
-                    
+                    new_labels = np.array([
+                        mapper[j] if j != -99 else j
+                        for j in new_labels_unmatched
+                    ])
+
                     # delete the right overlap
                     labels = labels[0:len(labels) - right_overlap]
                     # change the labels of the new clustering and concat
@@ -121,16 +130,19 @@ def st_decorator(target):
 
                 right_overlap = len(X[np.isin(X[:, 0],
                                               period[-frame_overlap + 1:])])
-                
-            if i + frame_size > max(time): # we need that condition, otherwise we'll do an unnessecary iteration
+
+            if i + frame_size > max(
+                    time
+            ):  # we need that condition, otherwise we'll do an unnessecary iteration
                 break
-        
+
         self.labels = labels
         return self
-    
+
     target.st_fit = st_fit
     target.st_fit_frame_split = st_fit_frame_split
     return target
+
 
 @st_decorator
 class ST_DBSCAN(DBSCAN):
@@ -169,9 +181,19 @@ class ST_DBSCAN(DBSCAN):
     
     Peca, I., Fuchs, G., Vrotsou, K., Andrienko, N. V., & Andrienko, G. L. (2012). Scalable Cluster Analysis of Spatial Events. In EuroVA@ EuroVis.
     """
+
     # overwrite sklearn's constructor
-    def __init__(self, eps1=0.5, eps2=10, min_samples=5, metric='precomputed',n_jobs=-1, algorithm='auto', leaf_size=30,
-                metric_params=None, p=None, dist='euclidean'):
+    def __init__(self,
+                 eps1=0.5,
+                 eps2=10,
+                 min_samples=5,
+                 metric='precomputed',
+                 n_jobs=-1,
+                 algorithm='auto',
+                 leaf_size=30,
+                 metric_params=None,
+                 p=None,
+                 dist='euclidean'):
         self.eps = eps1
         self.eps1 = eps1
         self.eps2 = eps2
@@ -183,15 +205,23 @@ class ST_DBSCAN(DBSCAN):
         self.metric_params = metric_params
         self.p = p
         self.dist = dist
-        
+
 
 @st_decorator
 class ST_Agglomerative(AgglomerativeClustering):
-    def __init__(self, eps1=0.5, eps2=10, n_clusters=2, *, affinity='precomputed',
+    def __init__(self,
+                 eps1=0.5,
+                 eps2=10,
+                 n_clusters=2,
+                 *,
+                 affinity='precomputed',
                  memory=None,
-                 connectivity=None, compute_full_tree='auto',
-                 linkage='average', distance_threshold=None,
-                 compute_distances=False, dist='euclidean'):
+                 connectivity=None,
+                 compute_full_tree='auto',
+                 linkage='average',
+                 distance_threshold=None,
+                 compute_distances=False,
+                 dist='euclidean'):
         self.eps1 = eps1
         self.eps2 = eps2
         self.n_clusters = n_clusters
@@ -203,13 +233,26 @@ class ST_Agglomerative(AgglomerativeClustering):
         self.affinity = affinity
         self.compute_distances = compute_distances
         self.dist = dist
-        
+
+
 @st_decorator
 class ST_KMeans(KMeans):
-    def __init__(self, eps1=0.5, eps2=10, n_clusters=8, *, init='k-means++', n_init=10,
-                 max_iter=300, tol=1e-4, precompute_distances='deprecated',
-                 verbose=0, random_state=None, copy_x=True,
-                 n_jobs='deprecated', algorithm='auto', dist='euclidean'):
+    def __init__(self,
+                 eps1=0.5,
+                 eps2=10,
+                 n_clusters=8,
+                 *,
+                 init='k-means++',
+                 n_init=10,
+                 max_iter=300,
+                 tol=1e-4,
+                 precompute_distances='deprecated',
+                 verbose=0,
+                 random_state=None,
+                 copy_x=True,
+                 n_jobs='deprecated',
+                 algorithm='auto',
+                 dist='euclidean'):
         self.eps1 = eps1
         self.eps2 = eps2
         self.n_clusters = n_clusters
@@ -224,13 +267,27 @@ class ST_KMeans(KMeans):
         self.n_jobs = n_jobs
         self.algorithm = algorithm
         self.dist = dist
-        
+
+
 @st_decorator
 class ST_OPTICS(OPTICS):
-    def __init__(self, eps1=0.5, eps2=10, min_samples=5, max_eps=np.inf, metric='precomputed',
-                 p=2, metric_params=None, cluster_method='xi', eps=None,
-                 xi=0.05, predecessor_correction=True, min_cluster_size=None,
-                 algorithm='auto', leaf_size=30, n_jobs=-1, dist='euclidean'):
+    def __init__(self,
+                 eps1=0.5,
+                 eps2=10,
+                 min_samples=5,
+                 max_eps=np.inf,
+                 metric='precomputed',
+                 p=2,
+                 metric_params=None,
+                 cluster_method='xi',
+                 eps=None,
+                 xi=0.05,
+                 predecessor_correction=True,
+                 min_cluster_size=None,
+                 algorithm='auto',
+                 leaf_size=30,
+                 n_jobs=-1,
+                 dist='euclidean'):
         self.eps1 = eps1
         self.eps2 = eps2
         self.max_eps = max_eps
@@ -247,14 +304,30 @@ class ST_OPTICS(OPTICS):
         self.predecessor_correction = predecessor_correction
         self.n_jobs = n_jobs
         self.dist = dist
-        
+
+
 @st_decorator
 class ST_SpectralClustering(SpectralClustering):
-    def __init__(self, eps1=0.5, eps2=10, n_clusters=8, *, eigen_solver=None, n_components=None,
-                 random_state=None, n_init=10, gamma=1., affinity='precomputed',
-                 n_neighbors=10, eigen_tol=0.0, assign_labels='kmeans',
-                 degree=3, coef0=1, kernel_params=None, n_jobs=None,
-                 verbose=False, dist='euclidean'):
+    def __init__(self,
+                 eps1=0.5,
+                 eps2=10,
+                 n_clusters=8,
+                 *,
+                 eigen_solver=None,
+                 n_components=None,
+                 random_state=None,
+                 n_init=10,
+                 gamma=1.,
+                 affinity='precomputed',
+                 n_neighbors=10,
+                 eigen_tol=0.0,
+                 assign_labels='kmeans',
+                 degree=3,
+                 coef0=1,
+                 kernel_params=None,
+                 n_jobs=None,
+                 verbose=False,
+                 dist='euclidean'):
         self.eps1 = eps1
         self.eps2 = eps2
         self.n_clusters = n_clusters
@@ -273,13 +346,22 @@ class ST_SpectralClustering(SpectralClustering):
         self.n_jobs = n_jobs
         self.verbose = verbose
         self.dist = dist
-        
-        
+
+
 @st_decorator
 class ST_AffinityPropagation(AffinityPropagation):
-    def __init__(self, eps1=0.5, eps2=10, damping=.5, max_iter=200, convergence_iter=15,
-                 copy=True, preference=None, affinity='precomputed',
-                 verbose=False, random_state='warn', dist='euclidean'):
+    def __init__(self,
+                 eps1=0.5,
+                 eps2=10,
+                 damping=.5,
+                 max_iter=200,
+                 convergence_iter=15,
+                 copy=True,
+                 preference=None,
+                 affinity='precomputed',
+                 verbose=False,
+                 random_state='warn',
+                 dist='euclidean'):
         self.eps1 = eps1
         self.eps2 = eps2
         self.damping = damping
@@ -291,12 +373,19 @@ class ST_AffinityPropagation(AffinityPropagation):
         self.affinity = affinity
         self.random_state = random_state
         self.dist = dist
-        
+
 
 @st_decorator
 class ST_BIRCH(Birch):
-    def __init__(self, eps1=0.5, eps2=10, threshold=0.5, branching_factor=50, n_clusters=3,
-                 compute_labels=True, copy=True, dist='euclidean'):
+    def __init__(self,
+                 eps1=0.5,
+                 eps2=10,
+                 threshold=0.5,
+                 branching_factor=50,
+                 n_clusters=3,
+                 compute_labels=True,
+                 copy=True,
+                 dist='euclidean'):
         self.eps1 = eps1
         self.eps2 = eps2
         self.threshold = threshold
@@ -305,23 +394,33 @@ class ST_BIRCH(Birch):
         self.compute_labels = compute_labels
         self.copy = copy
         self.dist = dist
-        
-        
+
+
 @st_decorator
 class ST_HDBSCAN(hdbscan.HDBSCAN):
-    def __init__(self, eps1=0.5, eps2=10, min_cluster_size=5, min_samples=None, cluster_selection_epsilon=0.0, max_cluster_size=0,
-                 metric='precomputed', alpha=1.0, p=None, #euclidean 
-                 algorithm='best', leaf_size=40,
-                 memory=Memory(cachedir=None, verbose=0),
-                 approx_min_span_tree=True,
-                 gen_min_span_tree=False,
-                 core_dist_n_jobs=4,
-                 cluster_selection_method='eom',
-                 allow_single_cluster=False,
-                 prediction_data=False,
-                 match_reference_implementation=False,
-                 dist='euclidean',
-                 **kwargs):
+    def __init__(
+            self,
+            eps1=0.5,
+            eps2=10,
+            min_cluster_size=5,
+            min_samples=None,
+            cluster_selection_epsilon=0.0,
+            max_cluster_size=0,
+            metric='precomputed',
+            alpha=1.0,
+            p=None,  #euclidean 
+            algorithm='best',
+            leaf_size=40,
+            memory=Memory(cachedir=None, verbose=0),
+            approx_min_span_tree=True,
+            gen_min_span_tree=False,
+            core_dist_n_jobs=4,
+            cluster_selection_method='eom',
+            allow_single_cluster=False,
+            prediction_data=False,
+            match_reference_implementation=False,
+            dist='euclidean',
+            **kwargs):
         self.eps1 = eps1
         self.eps2 = eps2
         self.min_cluster_size = min_cluster_size
