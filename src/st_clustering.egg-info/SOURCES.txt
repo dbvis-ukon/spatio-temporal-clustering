@@ -1,11 +1,10 @@
 MANIFEST.in
 README.md
-pyproject.toml
 setup.cfg
 setup.py
 src/VERSION
-src/__init__.py
-src/st_clustering.py
+src/st_clustering/__init__.py
+src/st_clustering/st_clustering.py
 src/st_clustering.egg-info/PKG-INFO
 src/st_clustering.egg-info/SOURCES.txt
 src/st_clustering.egg-info/dependency_links.txt
