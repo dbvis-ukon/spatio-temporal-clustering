@@ -1,4 +1,4 @@
-# spatio-temporal-clustering
+# ST-CLUSTERING
 
 **st_clustering** is an open-source software package for spatial-temporal clustering:
 
