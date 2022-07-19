@@ -24,6 +24,11 @@ def st_decorator(target):
         -------
         self
         """
+        # call sparse matrix method for larger inputs and DBSCAN
+        if len(X) > 35000 and type(self).__name__ == 'ST_DBSCAN':
+            st_fit_sparsematrix(self, X)
+            return self
+
         # check if input is correct
         X = check_array(X)
 
@@ -47,6 +52,10 @@ def st_decorator(target):
 
 
     def st_fit_sparsematrix(self, X):
+        """
+        Fit method for larger input arrays: instead of a dense distance matrix for performance reasons only a sparse
+        distance matrix is calculated and used for the DBSCAN clustering algorithm.
+        """
         # check if input is correct
         X = check_array(X)
 
@@ -275,7 +284,8 @@ class ST_Agglomerative(AgglomerativeClustering):
         self.compute_distances = compute_distances
         self.dist = dist
 
-
+"""
+commented out as kmeans takes feature array and no distance matrix as input
 @st_decorator
 class ST_KMeans(KMeans):
     def __init__(self,
@@ -308,7 +318,7 @@ class ST_KMeans(KMeans):
         self.n_jobs = n_jobs
         self.algorithm = algorithm
         self.dist = dist
-
+"""
 
 @st_decorator
 class ST_OPTICS(OPTICS):
@@ -415,7 +425,8 @@ class ST_AffinityPropagation(AffinityPropagation):
         self.random_state = random_state
         self.dist = dist
 
-
+"""
+commented out as Birch takes feature array and no distance matrix as input
 @st_decorator
 class ST_BIRCH(Birch):
     def __init__(self,
@@ -435,7 +446,7 @@ class ST_BIRCH(Birch):
         self.compute_labels = compute_labels
         self.copy = copy
         self.dist = dist
-
+"""
 
 @st_decorator
 class ST_HDBSCAN(hdbscan.HDBSCAN):
