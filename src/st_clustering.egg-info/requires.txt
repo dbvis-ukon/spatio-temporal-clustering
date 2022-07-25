@@ -1,9 +1,0 @@
-numpy
-scipy
-scikit-learn
-hdbscan
-joblib
-
-[testing]
-pytest
-pytest-cov

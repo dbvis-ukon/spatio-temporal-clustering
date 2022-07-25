@@ -10,4 +10,4 @@ except DistributionNotFound:
 finally:
     del get_distribution, DistributionNotFound
 
-from .st_clustering import ST_DBSCAN, ST_Agglomerative, ST_KMeans, ST_OPTICS, ST_SpectralClustering, ST_AffinityPropagation, ST_BIRCH, ST_HDBSCAN  # noqa: E402
+from .st_clustering import ST_DBSCAN, ST_Agglomerative, ST_OPTICS, ST_SpectralClustering, ST_AffinityPropagation, ST_HDBSCAN  # noqa: E402

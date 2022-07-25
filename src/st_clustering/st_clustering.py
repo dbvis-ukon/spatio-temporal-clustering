@@ -9,6 +9,7 @@ from sklearn.neighbors import NearestNeighbors
 
 
 def st_decorator(target):
+
     def st_fit(self, X):
         """
         Apply the ST clustering algorithm 
@@ -25,7 +26,7 @@ def st_decorator(target):
         self
         """
         # call sparse matrix method for larger inputs and DBSCAN
-        if len(X) > 35000 and type(self).__name__ == 'ST_DBSCAN':
+        if len(X) > 10000 and type(self).__name__ == 'ST_DBSCAN':
             st_fit_sparsematrix(self, X)
             return self
 
@@ -50,7 +51,6 @@ def st_decorator(target):
 
         return self
 
-
     def st_fit_sparsematrix(self, X):
         """
         Fit method for larger input arrays: instead of a dense distance matrix for performance reasons only a sparse
@@ -64,11 +64,11 @@ def st_decorator(target):
 
         n, m = X.shape
 
-
         # create sparse distance matrix for time attribute
         neigh2 = NearestNeighbors(metric='euclidean', radius=self.eps2)
-        neigh2.fit(X[:,0].reshape(n, 1))
-        B = neigh2.radius_neighbors_graph(X[:, 0].reshape(n, 1), mode='distance')
+        neigh2.fit(X[:, 0].reshape(n, 1))
+        B = neigh2.radius_neighbors_graph(X[:, 0].reshape(n, 1),
+                                          mode='distance')
 
         # create sparse distance matrix for spatial attributes
         neigh = NearestNeighbors(metric='euclidean', radius=self.eps1)
@@ -81,16 +81,19 @@ def st_decorator(target):
         v = np.array(A[row, column])[0]
 
         # create ney sparse distance matrix for spatial attributes
-        precomputed_matrix = coo_matrix((v, (row, column)), shape=(n, n))  # sparse matrix format more efficient for creation
-        precomputed_matrix = precomputed_matrix.tocsc()  # convert to sparse matrix format more efficient for matrix computations
-        precomputed_matrix.eliminate_zeros()  # to delete matrix entries which were non-zero in time matrix but zero in spatial matrix
+        precomputed_matrix = coo_matrix(
+            (v, (row, column)),
+            shape=(n, n))  # sparse matrix format more efficient for creation
+        precomputed_matrix = precomputed_matrix.tocsc(
+        )  # convert to sparse matrix format more efficient for matrix computations
+        precomputed_matrix.eliminate_zeros(
+        )  # to delete matrix entries which were non-zero in time matrix but zero in spatial matrix
 
         self.fit(precomputed_matrix)
 
         self.labels = self.labels_
 
         return self
-
 
     def st_fit_frame_split(self, X, frame_size, frame_overlap=None):
         """
@@ -259,6 +262,7 @@ class ST_DBSCAN(DBSCAN):
 
 @st_decorator
 class ST_Agglomerative(AgglomerativeClustering):
+
     def __init__(self,
                  eps1=0.5,
                  eps2=10,
@@ -283,6 +287,7 @@ class ST_Agglomerative(AgglomerativeClustering):
         self.affinity = affinity
         self.compute_distances = compute_distances
         self.dist = dist
+
 
 """
 commented out as kmeans takes feature array and no distance matrix as input
@@ -320,8 +325,10 @@ class ST_KMeans(KMeans):
         self.dist = dist
 """
 
+
 @st_decorator
 class ST_OPTICS(OPTICS):
+
     def __init__(self,
                  eps1=0.5,
                  eps2=10,
@@ -359,6 +366,7 @@ class ST_OPTICS(OPTICS):
 
 @st_decorator
 class ST_SpectralClustering(SpectralClustering):
+
     def __init__(self,
                  eps1=0.5,
                  eps2=10,
@@ -401,6 +409,7 @@ class ST_SpectralClustering(SpectralClustering):
 
 @st_decorator
 class ST_AffinityPropagation(AffinityPropagation):
+
     def __init__(self,
                  eps1=0.5,
                  eps2=10,
@@ -425,6 +434,7 @@ class ST_AffinityPropagation(AffinityPropagation):
         self.random_state = random_state
         self.dist = dist
 
+
 """
 commented out as Birch takes feature array and no distance matrix as input
 @st_decorator
@@ -448,8 +458,10 @@ class ST_BIRCH(Birch):
         self.dist = dist
 """
 
+
 @st_decorator
 class ST_HDBSCAN(hdbscan.HDBSCAN):
+
     def __init__(
             self,
             eps1=0.5,
