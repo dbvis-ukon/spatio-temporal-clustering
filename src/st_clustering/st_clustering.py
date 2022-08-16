@@ -158,21 +158,25 @@ def st_decorator(target):
                             zip(frame_one_overlap_labels,
                                 frame_two_overlap_labels)):
                         mapper[j[1]] = j[0]
+                    mapper[-1] = -1  # to  avoid outliers being mapped on a cluster
 
-                    # clusters without points in the overlapping area are ignored
+                    # clusters without points in the overlapping area are given new cluster
                     # otherwise, there will be a key error
                     ignore_clusters = set(self.labels) - set(
                         frame_two_overlap_labels)  # set difference
-                    # recode them to the value -99
-                    new_labels_unmatched = [
-                        j if j not in ignore_clusters else -99
-                        for j in self.labels
-                    ]
+                    # recode them to new cluster value
+                    if -1 in labels:
+                        labels_counter = len(set(labels)) - 1
+                    else:
+                        labels_counter = len(set(labels))
+                    for j in ignore_clusters:
+                        mapper[j] = labels_counter
+                        labels_counter += 1
 
                     # objects in the second frame are relabeled to match the cluster id from the first frame
+                    # objects in clusters with no overlap are assigned to new clusters
                     new_labels = np.array([
-                        mapper[j] if j != -99 else j
-                        for j in new_labels_unmatched
+                        mapper[j] for j in self.labels
                     ])
 
                     # delete the right overlap
