@@ -6,6 +6,7 @@ import hdbscan
 from joblib import Memory
 from scipy.sparse import coo_matrix, csc_matrix
 from sklearn.neighbors import NearestNeighbors
+import warnings
 
 
 def st_decorator(target):
@@ -27,8 +28,10 @@ def st_decorator(target):
         """
         # call sparse matrix method for larger inputs and DBSCAN
         if len(X) > 10000 and type(self).__name__ == 'ST_DBSCAN':
-            st_fit_sparsematrix(self, X)
-            return self
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                st_fit_sparsematrix(self, X)
+                return self
 
         # check if input is correct
         X = check_array(X)
