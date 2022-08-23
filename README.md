@@ -29,11 +29,9 @@ Available algorithms are:
 
 - ST DBSCAN
 - ST Agglomerative
-- ST KMeans
 - ST OPTICS
 - ST Spectral Clustering
 - ST Affinity Propagation
-- ST BIRCH
 - ST HDBSCAN
 
 For more details please see original [paper](https://scibib.dbvis.de/uploadedFiles/Cakmak_ST_Clustering_Benchmark.pdf):
