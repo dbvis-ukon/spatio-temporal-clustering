@@ -26,6 +26,10 @@ def st_decorator(target):
         -------
         self
         """
+        # give warning for large input data
+        if len(X) > 25000:
+            warnings.warn('As input data is very large, clustering probably will take some time. Thus, if clustering takes too long, it might make sense to use st_fit_frame_split method.')
+
         # call sparse matrix method for larger inputs and DBSCAN
         if len(X) > 10000 and type(self).__name__ == 'ST_DBSCAN':
             with warnings.catch_warnings():
